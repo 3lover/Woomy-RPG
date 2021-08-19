@@ -61,8 +61,9 @@ class Entity {
             }
             this.clicked = function (event) {
                 switch (this.id) {
-                    case "testingbtn":
-                        console.innerHTML = "you clicked the button! <br>";
+                    case "optionsBack":
+                        entities = [];
+                        startScreen();
                         break;
                     case "gamestartselect":
                     case "optionsMenu":
@@ -115,6 +116,7 @@ function init() {
     ctx.canvas.width = WIDTH;
     ctx.canvas.height = HEIGHT;
     console.innerHTML = "";
+    startScreen();
     refresh();
 }
 
@@ -188,16 +190,20 @@ function createNewGame() {
 function loadSaveGame() {
     console.innerHTML = "loading!"
 }
+function startScreen() {
+    moveIn(WIDTH / 4 + 10, [-WIDTH / 4, HEIGHT / 45, WIDTH / 4, HEIGHT / 4, "testingbtn"], ["press me", HEIGHT / 45, HEIGHT / 20, "start", WIDTH / 47], 2);
+    moveIn(WIDTH + 10, [-WIDTH, HEIGHT - (HEIGHT / 4) - (HEIGHT / 30), WIDTH - 20, HEIGHT / 4, "gamestartselect"],
+        ["Load Game#bNew Game#bOptions", HEIGHT / 45, 0, "start", WIDTH / 47], 3);
+}
 function showOptions() {
     entities = [];
-    moveIn(WIDTH + 10, [-WIDTH, 0 + (HEIGHT / 45), WIDTH - 20, HEIGHT * 0.2 - (HEIGHT / 15), "optionsTitle"],
+    moveIn(WIDTH + 10, [-WIDTH, 0 + (HEIGHT / 45), WIDTH - 20 - (WIDTH/5), HEIGHT * 0.2 - (HEIGHT / 15), "optionsTitle"],
         ["Options Menu", HEIGHT / 45, HEIGHT * 0.2 - (HEIGHT / 8), "start", WIDTH / 47], 1);
+    moveIn(-WIDTH + WIDTH - (WIDTH/5), [WIDTH, 0 + (HEIGHT / 45), WIDTH/5 - 10, HEIGHT * 0.2 - (HEIGHT / 15), "optionsBack"],
+        ["< Back", HEIGHT / 45, HEIGHT * 0.2 - (HEIGHT / 8), "start", WIDTH / 47], 2);
     moveIn(-WIDTH + 10, [WIDTH, HEIGHT - (HEIGHT * 0.8) - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.8, "optionsMenu"],
-        ["Game Speed#bCheat Mode#bOption 3#bOption 4#bOption 5#bOption 6", HEIGHT / 45, 0, "start", WIDTH / 47], 3);
+        ["Game Speed#bCheat Mode#bImortal Mode#bOption 4#bOption 5#bOption 6", HEIGHT / 45, 0, "start", WIDTH / 47], 3);
 }
 
 //set everything important up then set up the front page to start
 init()
-moveIn(WIDTH / 4 + 10, [-WIDTH / 4, HEIGHT / 45, WIDTH / 4, HEIGHT / 4, "testingbtn"], ["press me", HEIGHT / 45, HEIGHT / 20, "start", WIDTH / 47], 2);
-moveIn(WIDTH + 10, [-WIDTH, HEIGHT - (HEIGHT / 4) - (HEIGHT / 30), WIDTH - 20, HEIGHT / 4, "gamestartselect"],
-    ["Load Game#bNew Game#bOptions", HEIGHT / 45, 0, "start", WIDTH / 47], 3);

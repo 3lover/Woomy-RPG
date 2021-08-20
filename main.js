@@ -6,7 +6,7 @@ const c = document.getElementById("canvas"),
 var x_offset = 0,
     y_offset = 0,
     entities = [],
-    gameSettings = {gamespeed: 1, cheats: false};
+    gameSettings = { gamespeed: 1, cheats: false };
 
 function insideRect(x, y, i, options = 1) {
     //checks if the x/y position given is within button number i, and return what option for selectors
@@ -35,6 +35,11 @@ class Entity {
             ctx.beginPath();
             ctx.lineWidth = 2;
             switch (type) {
+                case 5:
+                    let img = new Image();
+                    img.src = CONTENT[0];
+                    ctx.drawImage(img, this.x, this.y, this.width, this.height);
+                    break;
                 case 4:
                     this.text = eval(CONTENT[0]).toString();
                     break;
@@ -244,16 +249,19 @@ function loadSaveGame() {
 }
 function startScreen() {
     entities = [];
-    moveIn(WIDTH / 4 + 10, [-WIDTH / 4, HEIGHT / 45, WIDTH / 4, HEIGHT / 4, "testingbtn"], ["press me", HEIGHT / 45, HEIGHT / 20, "start", WIDTH / 47], 2);
+    moveIn(WIDTH + 10, [-WIDTH, 0 + (HEIGHT / 45), WIDTH - 20, HEIGHT * 0.2 - (HEIGHT / 15), "mainMenuTitle"],
+        ["Woomy RPG I'm too lazy to come up with a name", HEIGHT / 45, 0, "start", WIDTH / 47], 1);
     moveIn(WIDTH + 10, [-WIDTH, HEIGHT - (HEIGHT / 4) - (HEIGHT / 30), WIDTH - 20, HEIGHT / 4, "gamestartselect"],
         ["Load Game#bNew Game#bOptions", HEIGHT / 45, 0, "start", WIDTH / 47], 3);
+    moveIn(WIDTH + 10, [-WIDTH/2 - HEIGHT * 0.25, HEIGHT - (HEIGHT * 0.8) - (HEIGHT / 30), HEIGHT * 0.5, HEIGHT * 0.5, "mainIconImg"],
+        ["mainIcon.png", HEIGHT / 45, 0, "start", WIDTH / 47], 5);
 }
 function showOptions() {
     entities = [];
     moveIn(WIDTH + 10, [-WIDTH, 0 + (HEIGHT / 45), WIDTH - 20 - (WIDTH / 5), HEIGHT * 0.2 - (HEIGHT / 15), "optionsTitle"],
         ["Options Menu", HEIGHT / 45, 0, "start", WIDTH / 47], 1);
     moveIn(-WIDTH + WIDTH - (WIDTH / 5), [WIDTH, 0 + (HEIGHT / 45), WIDTH / 5 - 10, HEIGHT * 0.2 - (HEIGHT / 15), "optionsBack"],
-        ["< Back", HEIGHT / 45, HEIGHT * 0.2 - (HEIGHT / 8), "start", WIDTH / 47], 2);
+        ["< Back", HEIGHT / 45, 0, "start", WIDTH / 47], 2);
     /*moveIn(-WIDTH + 10, [WIDTH, HEIGHT - (HEIGHT * 0.8) - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.8, "optionsMenu"],
         ["Game Speed#bCheat Mode#bImmortal Mode#bOption 4#bOption 5#bOption 6", HEIGHT / 45, 0, "start", WIDTH / 47], 3);*/
     moveIn(-WIDTH + 10, [WIDTH, HEIGHT * 0.3 - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.1, "gamespeedBtn"],

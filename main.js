@@ -5,7 +5,8 @@ const c = document.getElementById("canvas"),
     HEIGHT = window.innerHeight;
 var x_offset = 0,
     y_offset = 0,
-    entities = [];
+    entities = [],
+    gameSettings = {gamespeed: 1, cheats: false};
 
 function insideRect(x, y, i, options = 1) {
     //checks if the x/y position given is within button number i, and return what option for selectors
@@ -27,14 +28,18 @@ class Entity {
         this.state = 1;
         this.id = PROPS[4];
         this.type = type;
-        if (type == 3) this.state = 0
+        this.text = CONTENT[0];
+        if (type == 3) this.state = 0;
         this.refresh = function () {
             let stringLines = [];
             ctx.beginPath();
             ctx.lineWidth = 2;
             switch (type) {
+                case 4:
+                    this.text = eval(CONTENT[0]).toString();
+                    break;
                 case 3:
-                    this.options = (CONTENT[0].match(/#b/g) || []).length + 1;
+                    this.options = (this.text.match(/#b/g) || []).length + 1;
                     for (let i = 0; i < this.options; i++) {
                         if (this.state == i) ctx.fillStyle = "grey";
                         else ctx.fillStyle = "white";
@@ -44,10 +49,10 @@ class Entity {
                     }
                     ctx.textAlign = CONTENT[3];
                     ctx.font = (CONTENT[4]) + "px Corsiva";
-                    stringLines = CONTENT[0].split("#b");
+                    stringLines = this.text.split("#b");
                     for (let i = 0; i < stringLines.length; i++) {
                         ctx.fillStyle = 'black';
-                        ctx.fillText(i + "- " + stringLines[i], this.x + CONTENT[1], this.y + CONTENT[2] + (CONTENT[4]) + (i * (this.height / this.options)));
+                        ctx.fillText((i + 1) + "- " + stringLines[i], this.x + CONTENT[1], this.y + CONTENT[2] + (CONTENT[4]) + (i * (this.height / this.options)));
                     }
                     break;
                 case 2:
@@ -62,8 +67,18 @@ class Entity {
             this.clicked = function (event) {
                 switch (this.id) {
                     case "optionsBack":
-                        entities = [];
                         startScreen();
+                        break;
+                    case "gamespeedBtn":
+                        gameSettings.gamespeed = gameSettings.gamespeed >= 3 ? 0.25 :
+                            gameSettings.gamespeed < 1 ? gameSettings.gamespeed + 0.25 :
+                                gameSettings.gamespeed + 0.5;
+                        refresh();
+                        break;
+                    case "cheatsBtn":
+                        gameSettings.cheats = gameSettings.cheats ? false :
+                            true;
+                        refresh();
                         break;
                     case "gamestartselect":
                     case "optionsMenu":
@@ -71,17 +86,17 @@ class Entity {
                         break;
                 }
             }
-            if (type == 2 || type == 1) {
+            if (type == 2 || type == 1 || type == 4) {
                 ctx.textAlign = CONTENT[3];
                 ctx.font = (CONTENT[4]) + "px Corsiva";
-                stringLines = CONTENT[0].split("#b");
+                stringLines = this.text.split("#b");
                 for (let i = 0; i < stringLines.length; i++) {
                     while (stringLines[i].length > (WIDTH - 20) / (WIDTH / 90)) {
                         stringLines.splice(i, 0, stringLines[i].substring(0, (WIDTH - 20) / (WIDTH / 90)));
                         stringLines[i + 1] = stringLines[i + 1].substring((WIDTH - 20) / (WIDTH / 90));
                         if (stringLines[i + 1][0] == " ") stringLines[i + 1] = stringLines[i + 1].substring(1);
                     }
-                    ctx.fillText(stringLines[i], this.x + CONTENT[1], this.y + CONTENT[2] + (CONTENT[4] * i));
+                    ctx.fillText(stringLines[i], this.x + CONTENT[1], this.y + CONTENT[2] + (CONTENT[4]) + (i * this.height));
                     if (i > 2) break;
                 }
             }
@@ -136,13 +151,35 @@ function numberSubmit(num) {
             case "gamestartselect":
                 switch (select.state) {
                     case 0:
-                        createNewGame()
+                        loadSaveGame()
                         break;
                     case 1:
-                        loadSaveGame()
+                        createNewGame()
                         break;
                     case 2:
                         showOptions()
+                        break;
+                }
+                break;
+            case "optionsMenu":
+                switch (select.state) {
+                    case 0:
+                        //speed
+                        break;
+                    case 1:
+                        //cheat mode
+                        break;
+                    case 2:
+                        //immortal mode IDK
+                        break;
+                    case 3:
+                        //option 4
+                        break;
+                    case 4:
+                        //option 5
+                        break;
+                    case 5:
+                        //option 6
                         break;
                 }
                 break;
@@ -157,21 +194,36 @@ function keyPress(event) {
             numberSubmit(-1);
             break;
         case 48:
+        case 49:
+            // 1 or 0 pressed
             numberSubmit(0);
             break;
-        case 49:
+        case 50:
+            // 2 pressed
             numberSubmit(1);
             break;
-        case 50:
+        case 51:
+            // 3 pressed
             numberSubmit(2);
             break;
-        case 51:
+        case 52:
+            // 4 or 0 pressed
             numberSubmit(3);
             break;
+        case 53:
+            // 5 pressed
+            numberSubmit(4);
+            break;
+        case 54:
+            // 6 pressed
+            numberSubmit(5);
+            break;
         case 38:
+            // up arrow pressed
             numberSubmit(-2);
             break;
         case 40:
+            //down arrow pressed
             numberSubmit(-3);
             break;
     }
@@ -191,18 +243,27 @@ function loadSaveGame() {
     console.innerHTML = "loading!"
 }
 function startScreen() {
+    entities = [];
     moveIn(WIDTH / 4 + 10, [-WIDTH / 4, HEIGHT / 45, WIDTH / 4, HEIGHT / 4, "testingbtn"], ["press me", HEIGHT / 45, HEIGHT / 20, "start", WIDTH / 47], 2);
     moveIn(WIDTH + 10, [-WIDTH, HEIGHT - (HEIGHT / 4) - (HEIGHT / 30), WIDTH - 20, HEIGHT / 4, "gamestartselect"],
         ["Load Game#bNew Game#bOptions", HEIGHT / 45, 0, "start", WIDTH / 47], 3);
 }
 function showOptions() {
     entities = [];
-    moveIn(WIDTH + 10, [-WIDTH, 0 + (HEIGHT / 45), WIDTH - 20 - (WIDTH/5), HEIGHT * 0.2 - (HEIGHT / 15), "optionsTitle"],
-        ["Options Menu", HEIGHT / 45, HEIGHT * 0.2 - (HEIGHT / 8), "start", WIDTH / 47], 1);
-    moveIn(-WIDTH + WIDTH - (WIDTH/5), [WIDTH, 0 + (HEIGHT / 45), WIDTH/5 - 10, HEIGHT * 0.2 - (HEIGHT / 15), "optionsBack"],
+    moveIn(WIDTH + 10, [-WIDTH, 0 + (HEIGHT / 45), WIDTH - 20 - (WIDTH / 5), HEIGHT * 0.2 - (HEIGHT / 15), "optionsTitle"],
+        ["Options Menu", HEIGHT / 45, 0, "start", WIDTH / 47], 1);
+    moveIn(-WIDTH + WIDTH - (WIDTH / 5), [WIDTH, 0 + (HEIGHT / 45), WIDTH / 5 - 10, HEIGHT * 0.2 - (HEIGHT / 15), "optionsBack"],
         ["< Back", HEIGHT / 45, HEIGHT * 0.2 - (HEIGHT / 8), "start", WIDTH / 47], 2);
-    moveIn(-WIDTH + 10, [WIDTH, HEIGHT - (HEIGHT * 0.8) - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.8, "optionsMenu"],
-        ["Game Speed#bCheat Mode#bImortal Mode#bOption 4#bOption 5#bOption 6", HEIGHT / 45, 0, "start", WIDTH / 47], 3);
+    /*moveIn(-WIDTH + 10, [WIDTH, HEIGHT - (HEIGHT * 0.8) - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.8, "optionsMenu"],
+        ["Game Speed#bCheat Mode#bImmortal Mode#bOption 4#bOption 5#bOption 6", HEIGHT / 45, 0, "start", WIDTH / 47], 3);*/
+    moveIn(-WIDTH + 10, [WIDTH, HEIGHT * 0.3 - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.1, "gamespeedBtn"],
+        ["Game Speed:", HEIGHT / 45, 0, "start", WIDTH / 47], 2);
+    moveIn(WIDTH + 10, [-WIDTH, HEIGHT * 0.4 - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.1, "gamespeedDisplay"],
+        ["gameSettings.gamespeed", HEIGHT / 45, 0, "start", WIDTH / 47], 4);
+    moveIn(-WIDTH + 10, [WIDTH, HEIGHT * 0.6 - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.1, "cheatsBtn"],
+        ["Cheats Enabled:", HEIGHT / 45, 0, "start", WIDTH / 47], 2);
+    moveIn(WIDTH + 10, [-WIDTH, HEIGHT * 0.7 - (HEIGHT / 30), WIDTH - 20, HEIGHT * 0.1, "cheatsDisplay"],
+        ["gameSettings.cheats", HEIGHT / 45, 0, "start", WIDTH / 47], 4);
 }
 
 //set everything important up then set up the front page to start
